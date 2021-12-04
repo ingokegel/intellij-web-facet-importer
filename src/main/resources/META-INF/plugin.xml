@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<idea-plugin>
+    <name>Web Facet Importer</name>
+    <id>web-facet-importer</id>
+    <depends>com.intellij.javaee.web</depends>
+    <description>
+        Imports web facets for the gradle-idea-ext plugin
+    </description>
+    <version>X</version>
+    <vendor>Ingo Kegel</vendor>
+    <idea-version since-build="213"/>
+    <extensions defaultExtensionNs="com.intellij">
+        <externalSystem.facetConfigurationImporter implementation="com.ejt.wfi.WebFacetImporter"/>
+    </extensions>
+</idea-plugin>
