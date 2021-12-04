@@ -18,15 +18,19 @@ class WebFacetImporter : FacetConfigurationImporter<WebFacet> {
         val sourceSet = cfg["sourceSet"]
         val sourceSetModule = ModuleManager.getInstance(module.project).findModuleByName("${module.name}.$sourceSet")
         val sourceSetFacetManager = sourceSetModule?.getComponent(FacetManager::class.java)
-        val facet = sourceSetFacetManager?.getFacetByType(WebFacetType.getInstance().id)
-        if (facet != null) {
+        if (sourceSetFacetManager != null) {
+            val facet = sourceSetFacetManager.getFacetByType(WebFacetType.getInstance().id)
+                ?: sourceSetFacetManager.addFacet(WebFacetType.getInstance(), name, null)
             val webRoots = cfg["webRoots"]
             if (webRoots is Map<*, *>) {
                 for ((directoryUrl, relativePath) in webRoots) {
                     if (directoryUrl !is String || relativePath !is String) {
                         continue
                     }
-                    facet.addWebRoot(VfsUtilCore.pathToUrl(directoryUrl), relativePath)
+                    val url = VfsUtilCore.pathToUrl(directoryUrl)
+                    if (facet.webRoots.none { it.directoryUrl == url }) {
+                        facet.addWebRoot(url, relativePath)
+                    }
                 }
             }
             sourceSetFacetManager.facetConfigurationChanged(facet)
