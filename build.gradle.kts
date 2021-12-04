@@ -22,4 +22,8 @@ tasks {
         gradleVersion = "7.3.1"
         distributionType = DistributionType.ALL
     }
+
+    runPluginVerifier {
+        ideVersions.set(listOf("IU-2021.3"))
+    }
 }
