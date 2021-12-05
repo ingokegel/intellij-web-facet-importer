@@ -16,11 +16,16 @@ class WebFacetImporter : FacetConfigurationImporter<WebFacet> {
         facetManager: FacetManager
     ): Collection<WebFacet> {
         val sourceSet = cfg["sourceSet"]
-        val sourceSetModule = ModuleManager.getInstance(module.project).findModuleByName("${module.name}.$sourceSet")
-        val sourceSetFacetManager = sourceSetModule?.getComponent(FacetManager::class.java)
-        if (sourceSetFacetManager != null) {
-            val facet = sourceSetFacetManager.getFacetByType(WebFacetType.getInstance().id)
-                ?: sourceSetFacetManager.addFacet(WebFacetType.getInstance(), name, null)
+        val targetFacetManager = if (sourceSet != null) {
+            ModuleManager.getInstance(module.project)
+                .findModuleByName("${module.name}.$sourceSet")
+                ?.getComponent(FacetManager::class.java)
+        } else {
+            facetManager
+        }
+        if (targetFacetManager != null) {
+            val facet = targetFacetManager.getFacetByType(WebFacetType.getInstance().id)
+                ?: targetFacetManager.addFacet(WebFacetType.getInstance(), name, null)
             val webRoots = cfg["webRoots"]
             if (webRoots is Map<*, *>) {
                 for ((directoryUrl, relativePath) in webRoots) {
@@ -33,9 +38,11 @@ class WebFacetImporter : FacetConfigurationImporter<WebFacet> {
                     }
                 }
             }
-            sourceSetFacetManager.facetConfigurationChanged(facet)
+            targetFacetManager.facetConfigurationChanged(facet)
+            return listOf(facet)
+        } else {
+            return emptyList()
         }
-        return emptyList() // return value is not used anyway
     }
 
     override fun canHandle(typeName: String) = typeName == "web"
